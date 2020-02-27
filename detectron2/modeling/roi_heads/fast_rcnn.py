@@ -87,6 +87,11 @@ def fast_rcnn_inference_single_image(
     Returns:
         Same as `fast_rcnn_inference`, but for only one image.
     """
+    valid_mask = torch.isfinite(boxes).all(dim=1) & torch.isfinite(scores).all(dim=1)
+    if not valid_mask.all():
+        boxes = boxes[valid_mask]
+        scores = scores[valid_mask]
+
     scores = scores[:, :-1]
     num_bbox_reg_classes = boxes.shape[1] // 4
     # Convert to Boxes to use the `clip` function ...
@@ -121,6 +126,7 @@ def fast_rcnn_inference_single_image(
 class FastRCNNOutputs(object):
     """
     A class that stores information about outputs of a Fast R-CNN head.
+    It provides methods that are used to decode the outputs of a Fast R-CNN head.
     """
 
     def __init__(
@@ -254,6 +260,27 @@ class FastRCNNOutputs(object):
         loss_box_reg = loss_box_reg / self.gt_classes.numel()
         return loss_box_reg
 
+    def _predict_boxes(self):
+        """
+        Returns:
+            Tensor: A Tensors of predicted class-specific or class-agnostic boxes
+                for all images in a batch. Element i has shape (Ri, K * B) or (Ri, B), where Ri is
+                the number of predicted objects for image i and B is the box dimension (4 or 5)
+        """
+        num_pred = len(self.proposals)
+        B = self.proposals.tensor.shape[1]
+        K = self.pred_proposal_deltas.shape[1] // B
+        boxes = self.box2box_transform.apply_deltas(
+            self.pred_proposal_deltas.view(num_pred * K, B),
+            self.proposals.tensor.unsqueeze(1).expand(num_pred, K, B).reshape(-1, B),
+        )
+        return boxes.view(num_pred, K * B)
+
+    """
+    A subclass is expected to have the following methods because
+    they are used to query information about the head predictions.0
+    """
+
     def losses(self):
         """
         Compute the default losses for box head in Fast(er) R-CNN,
@@ -274,14 +301,28 @@ class FastRCNNOutputs(object):
                 for each image. Element i has shape (Ri, K * B) or (Ri, B), where Ri is
                 the number of predicted objects for image i and B is the box dimension (4 or 5)
         """
-        num_pred = len(self.proposals)
+        return self._predict_boxes().split(self.num_preds_per_image, dim=0)
+
+    def predict_boxes_for_gt_classes(self):
+        """
+        Returns:
+            list[Tensor]: A list of Tensors of predicted boxes for GT classes in case of
+                class-specific box head. Element i of the list has shape (Ri, B), where Ri is
+                the number of predicted objects for image i and B is the box dimension (4 or 5)
+        """
+        predicted_boxes = self._predict_boxes()
         B = self.proposals.tensor.shape[1]
-        K = self.pred_proposal_deltas.shape[1] // B
-        boxes = self.box2box_transform.apply_deltas(
-            self.pred_proposal_deltas.view(num_pred * K, B),
-            self.proposals.tensor.unsqueeze(1).expand(num_pred, K, B).reshape(-1, B),
-        )
-        return boxes.view(num_pred, K * B).split(self.num_preds_per_image, dim=0)
+        # If the box head is class-agnostic, then the method is equivalent to `predicted_boxes`.
+        if predicted_boxes.shape[1] > B:
+            num_pred = len(self.proposals)
+            num_classes = predicted_boxes.shape[1] // B
+            # Some proposals are ignored or have a background class. Their gt_classes
+            # cannot be used as index.
+            gt_classes = torch.clamp(self.gt_classes, 0, num_classes - 1)
+            predicted_boxes = predicted_boxes.view(num_pred, num_classes, B)[
+                torch.arange(num_pred, dtype=torch.long, device=predicted_boxes.device), gt_classes
+            ]
+        return predicted_boxes.split(self.num_preds_per_image, dim=0)
 
     def predict_probs(self):
         """
