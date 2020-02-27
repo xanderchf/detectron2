@@ -21,6 +21,7 @@ import os
 
 from detectron2.data import MetadataCatalog, DatasetCatalog
 from .register_coco import register_coco_instances, register_coco_panoptic_separated
+from .register_bdd100k import register_bdd100k_instances, register_bdd100k_sem_seg
 from .lvis import register_lvis_instances, get_lvis_instances_meta
 from .cityscapes import load_cityscapes_instances, load_cityscapes_semantic
 from .pascal_voc import register_pascal_voc
@@ -207,9 +208,88 @@ def register_all_pascal_voc(root="datasets"):
         register_pascal_voc(name, os.path.join(root, dirname), split, year)
         MetadataCatalog.get(name).evaluator_type = "pascal_voc"
 
+# ==== Predefined datasets and splits for BDD100K ==========
+
+_PREDEFINED_SPLITS_BDD_INSTANCES = {
+    "bdd100k_det": {
+        "bdd100k_train_det": ("bdd100k/images/100k/train",
+                          "bdd100k/labels/det/det_train.json"
+                          ),
+
+        "bdd100k_val_det": ("bdd100k/images/100k/val",
+                        "bdd100k/labels/det/det_val.json")
+    },
+    "bdd100k_det_8cls": {
+        "bdd100k_train_det_8cls": ("bdd100k/images/100k/train",
+                          "bdd100k/labels/det/det_8cls_train.json"
+                          ),
+
+        "bdd100k_val_det_8cls": ("bdd100k/images/100k/val",
+                        "bdd100k/labels/det/det_8cls_val.json")
+    },
+    "bdd100k_ins_seg": {
+        "bdd100k_train_ins_seg": ("bdd100k/images/10k/train",
+                          "bdd100k/labels/ins_seg/ins_seg_train.json"
+                          ),
+
+        "bdd100k_val_ins_seg": ("bdd100k/images/10k/val",
+                        "bdd100k/labels/ins_seg/ins_seg_val.json")
+    }
+}
+
+_PREDEFINED_SPLITS_BDD_SEG = {
+    "bdd100k_sem_seg": {
+        "bdd100k_train_sem_seg": ("bdd100k/images/10k/train",
+                          "bdd100k/labels/sem_seg/sem_seg_train"
+                          ),
+
+        "bdd100k_val_sem_seg": ("bdd100k/images/10k/val",
+                        "bdd100k/labels/sem_seg/sem_seg_val")
+    },
+    "bdd100k_drivable": {
+        "bdd100k_train_drivable": ("bdd100k/images/100k/train",
+                          "bdd100k/labels/drivable/drivable_train"
+                          ),
+
+        "bdd100k_val_drivable": ("bdd100k/images/100k/val",
+                        "bdd100k/labels/drivable/drivable_val")
+    },
+    "bdd100k_lane": {
+        "bdd100k_train_lane": ("bdd100k/images/100k/train",
+                          "bdd100k/labels/lane/lane_train"
+                          ),
+
+        "bdd100k_val_lane": ("bdd100k/images/100k/val",
+                        "bdd100k/labels/lane/lane_val")
+    }
+}
+
+def register_all_bdd(root='datasets'):
+
+    # bdd100k meta data
+    # fmt: off
+    # fmt: on
+    for key, value in _PREDEFINED_SPLITS_BDD_INSTANCES.items():
+        for name, (img_dir, label_file) in value.items():
+            register_bdd100k_instances(name, _get_builtin_metadata('bdd100k_instances'),
+                                    os.path.join(root, label_file),
+                                    os.path.join(root, img_dir))
+
+    for key, value in _PREDEFINED_SPLITS_BDD_SEG.items():
+        for (
+            name,
+            (image_root, semantic_root),
+        ) in value.items():
+            register_bdd100k_sem_seg(
+                name,
+                _get_builtin_metadata(key),
+                os.path.join(root, image_root),
+                os.path.join(root, semantic_root),
+            )
 
 # Register them all under "./datasets"
 register_all_coco()
 register_all_lvis()
 register_all_cityscapes()
 register_all_pascal_voc()
+register_all_bdd()

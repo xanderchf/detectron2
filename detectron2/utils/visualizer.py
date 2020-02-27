@@ -369,7 +369,7 @@ class Visualizer:
         )
         return self.output
 
-    def draw_sem_seg(self, sem_seg, area_threshold=None, alpha=0.8):
+    def draw_sem_seg(self, sem_seg, area_threshold=None, alpha=0.8, ignore_label=None):
         """
         Draw semantic segmentation predictions/labels.
 
@@ -387,6 +387,8 @@ class Visualizer:
         sorted_idxs = np.argsort(-areas).tolist()
         labels = labels[sorted_idxs]
         for label in filter(lambda l: l < len(self.metadata.stuff_classes), labels):
+            if label == ignore_label:
+                continue
             try:
                 mask_color = [x / 255 for x in self.metadata.stuff_colors[label]]
             except (AttributeError, IndexError):
@@ -397,7 +399,7 @@ class Visualizer:
             self.draw_binary_mask(
                 binary_mask,
                 color=mask_color,
-                edge_color=_OFF_WHITE,
+                # edge_color=_OFF_WHITE,
                 text=text,
                 alpha=alpha,
                 area_threshold=area_threshold,

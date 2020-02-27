@@ -57,7 +57,16 @@ class VisualizationDemo(object):
         else:
             if "sem_seg" in predictions:
                 vis_output = visualizer.draw_sem_seg(
-                    predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
+                    predictions["sem_seg"].argmax(dim=0).to(self.cpu_device), 0, ignore_label=19
+                )
+
+            if "drivable" in predictions:
+                vis_output = visualizer.draw_sem_seg(
+                    predictions["drivable"].argmax(dim=0).to(self.cpu_device), 0, ignore_label=0
+                )
+            if "lane" in predictions:
+                vis_output = visualizer.draw_sem_seg(
+                    predictions["lane"].argmax(dim=0).to(self.cpu_device), 0, ignore_label=0
                 )
             if "instances" in predictions:
                 instances = predictions["instances"].to(self.cpu_device)

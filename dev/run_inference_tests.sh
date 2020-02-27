@@ -2,8 +2,8 @@
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
 
 BIN="python tools/train_net.py"
-OUTPUT="inference_test_output"
-NUM_GPUS=2
+OUTPUT="./out/sem_seg"
+NUM_GPUS=1
 
 CFG_LIST=( "${@:1}" )
 

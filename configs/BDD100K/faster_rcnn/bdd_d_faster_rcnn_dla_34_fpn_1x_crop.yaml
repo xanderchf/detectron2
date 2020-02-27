@@ -1,0 +1,26 @@
+_BASE_: "../../Base-RCNN-FPN.yaml"
+MODEL:
+  WEIGHTS: "./checkpoints/backbone_weights/dla/dla34-ba72cf86.pth"
+  MASK_ON: False
+  BACKBONE:
+    NAME: "build_dla_fpn_backbone"
+  DLA:
+    OUT_FEATURES: ["level2", "level3", "level4", "level5"]
+    ARCH: "DLA-34"
+  FPN:
+    IN_FEATURES: ["level2", "level3", "level4", "level5"]
+  ROI_HEADS:
+    NUM_CLASSES: 10
+DATASETS:
+  TRAIN: ("bdd100k_train",)
+  TEST: ("bdd100k_val",)
+SOLVER:
+  IMS_PER_BATCH: 16
+  BASE_LR: 0.02
+  STEPS: (36000, 48000,)
+  MAX_ITER: 52500
+INPUT:
+  MIN_SIZE_TRAIN: (800,)
+  CROP:
+    ENABLED: True
+OUTPUT_DIR: "./checkpoints/bdd100k/d/faster_rcnn/faster_rcnn_dla34_fpn_1x_crop"

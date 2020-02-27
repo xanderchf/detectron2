@@ -118,7 +118,14 @@ class COCOEvaluator(DatasetEvaluator):
         if len(self._predictions) == 0:
             self._logger.warning("[COCOEvaluator] Did not receive valid predictions.")
             return {}
-
+        ###### TEMPORARY ######
+        # d = {0:0,1:1,2:2,3:4,4:3,5:7,6:6,7:5}
+        d = {0:0,1:5,2:2,3:6,5:3,6:7,7:4,9:8} # ,9:7
+        for i in self._predictions:
+            i['instances'] = [j for j in i['instances'] if j['category_id'] in d]
+            for j in i['instances']:
+                j['category_id'] = d[j['category_id']]
+        ###### TEMPORARY ######
         if self._output_dir:
             PathManager.mkdirs(self._output_dir)
             file_path = os.path.join(self._output_dir, "instances_predictions.pth")

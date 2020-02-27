@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved
-
+import numpy as np
 
 # All coco categories, together with their nice-looking visualization colors
 # It's from https://github.com/cocodataset/panopticapi/blob/master/panoptic_coco_categories.json
@@ -140,6 +140,80 @@ COCO_CATEGORIES = [
     {"color": [250, 141, 255], "isthing": 0, "id": 200, "name": "rug-merged"},
 ]
 
+BDD_CATEGORIES = [
+    {'name': 'background', 'color': (0, 0, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 0, 'tracked': 0},
+    {'name': 'dynamic', 'color': (111, 74, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 1, 'tracked': 0},
+    {'name': 'ego vehicle', 'color': (0, 0, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 2, 'tracked': 0},
+    {'name': 'ground', 'color': (81, 0, 81), 'semSegId': 19, 'hasInstance': 0, 'id': 3, 'tracked': 0},
+    {'name': 'static', 'color': (0, 0, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 4, 'tracked': 0},
+    {'name': 'parking', 'color': (250, 170, 160), 'semSegId': 19, 'hasInstance': 0, 'id': 5, 'tracked': 0},
+    {'name': 'rail track', 'color': (230, 150, 140), 'semSegId': 19, 'hasInstance': 0, 'id': 6, 'tracked': 0},
+    {'name': 'road', 'color': (128, 64, 128), 'semSegId': 0, 'hasInstance': 0, 'id': 7, 'tracked': 0},
+    {'name': 'sidewalk', 'color': (244, 35, 232), 'semSegId': 1, 'hasInstance': 0, 'id': 8, 'tracked': 0},
+    {'name': 'bridge', 'color': (150, 100, 100), 'semSegId': 19, 'hasInstance': 0, 'id': 9, 'tracked': 0},
+    {'name': 'building', 'color': (70, 70, 70), 'semSegId': 2, 'hasInstance': 0, 'id': 10, 'tracked': 0},
+    {'name': 'fence', 'color': (190, 153, 153), 'semSegId': 4, 'hasInstance': 0, 'id': 11, 'tracked': 0},
+    {'name': 'garage', 'color': (180, 100, 180), 'semSegId': 19, 'hasInstance': 0, 'id': 12, 'tracked': 0},
+    {'name': 'guard rail', 'color': (180, 165, 180), 'semSegId': 19, 'hasInstance': 0, 'id': 13, 'tracked': 0},
+    {'name': 'tunnel', 'color': (150, 120, 90), 'semSegId': 19, 'hasInstance': 0, 'id': 14, 'tracked': 0},
+    {'name': 'wall', 'color': (102, 102, 156), 'semSegId': 3, 'hasInstance': 0, 'id': 15, 'tracked': 0},
+    {'name': 'banner', 'color': (250, 170, 100), 'semSegId': 19, 'hasInstance': 0, 'id': 16, 'tracked': 0},
+    {'name': 'billboard', 'color': (220, 220, 250), 'semSegId': 19, 'hasInstance': 0, 'id': 17, 'tracked': 0},
+    {'name': 'lane divider', 'color': (255, 165, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 18, 'tracked': 0},
+    {'name': 'parking sign', 'color': (220, 20, 60), 'semSegId': 19, 'hasInstance': 0, 'id': 19, 'tracked': 0},
+    {'name': 'pole', 'color': (153, 153, 153), 'semSegId': 5, 'hasInstance': 0, 'id': 20, 'tracked': 0},
+    {'name': 'polegroup', 'color': (153, 153, 153), 'semSegId': 19, 'hasInstance': 0, 'id': 21, 'tracked': 0},
+    {'name': 'street light', 'color': (220, 220, 100), 'semSegId': 19, 'hasInstance': 0, 'id': 22, 'tracked': 0},
+    {'name': 'traffic cone', 'color': (255, 70, 0), 'semSegId': 19, 'hasInstance': 0, 'id': 23, 'tracked': 0},
+    {'name': 'traffic device', 'color': (220, 220, 220), 'semSegId': 19, 'hasInstance': 0, 'id': 24, 'tracked': 0},
+    {'name': 'traffic light', 'color': (250, 170, 30), 'semSegId': 6, 'hasInstance': 1, 'id': 25, 'tracked': 0, 'thing_id': 9},
+    {'name': 'traffic sign', 'color': (220, 220, 0), 'semSegId': 7, 'hasInstance': 1, 'id': 26, 'tracked': 0, 'thing_id': 10},
+    {'name': 'traffic sign frame', 'color': (250, 170, 250), 'semSegId': 19, 'hasInstance': 0, 'id': 27, 'tracked': 0},
+    {'name': 'terrain', 'color': (152, 251, 152), 'semSegId': 9, 'hasInstance': 0, 'id': 28, 'tracked': 0},
+    {'name': 'vegetation', 'color': (107, 142, 35), 'semSegId': 8, 'hasInstance': 0, 'id': 29, 'tracked': 0},
+    {'name': 'sky', 'color': (70, 130, 180), 'semSegId': 10, 'hasInstance': 0, 'id': 30, 'tracked': 0},
+    {'name': 'person', 'color': (220, 20, 60), 'semSegId': 11, 'hasInstance': 1, 'id': 31, 'tracked': 1, 'thing_id': 1},
+    {'name': 'rider', 'color': (255, 0, 0), 'semSegId': 12, 'hasInstance': 1, 'id': 32, 'tracked': 1, 'thing_id': 2},
+    {'name': 'bicycle', 'color': (119, 11, 32), 'semSegId': 18, 'hasInstance': 1, 'id': 33, 'tracked': 1, 'thing_id': 6},
+    {'name': 'bus', 'color': (0, 60, 100), 'semSegId': 15, 'hasInstance': 1, 'id': 34, 'tracked': 1, 'thing_id': 4},
+    {'name': 'car', 'color': (0, 0, 142), 'semSegId': 13, 'hasInstance': 1, 'id': 35, 'tracked': 1, 'thing_id': 3},
+    {'name': 'caravan', 'color': (0, 0, 90), 'semSegId': 19, 'hasInstance': 0, 'id': 36, 'tracked': 1},
+    {'name': 'motorcycle', 'color': (0, 0, 230), 'semSegId': 17, 'hasInstance': 1, 'id': 37, 'tracked': 1, 'thing_id': 7},
+    {'name': 'trailer', 'color': (0, 0, 110), 'semSegId': 19, 'hasInstance': 0, 'id': 38, 'tracked': 1},
+    {'name': 'train', 'color': (0, 80, 100), 'semSegId': 16, 'hasInstance': 1, 'id': 39, 'tracked': 1, 'thing_id': 8},
+    {'name': 'truck', 'color': (0, 0, 70), 'semSegId': 14, 'hasInstance': 1, 'id': 40, 'tracked': 1, 'thing_id': 5}
+]
+
+BDD_DRIVABLE_CATEGORIES = [
+    {'name': 'background', 'color': (0, 0, 0), 'id': 0, 'semSegId': 0},
+    {'name': 'direct', 'color': (255, 0, 0), 'id': 1, 'semSegId': 1},
+    {'name': 'alternative', 'color': (0, 0, 255), 'id': 2, 'semSegId': 2}
+]
+
+BDD_LANE_DIRECTIONS = [
+    {'name': 'background', 'color': (0, 0, 0), 'id': 0, 'semSegId': 0, "ignoredInSemSegEval": 0},
+    {'name': 'parallel', 'color': (255, 0, 0), 'id': 1, 'semSegId': 1, "ignoredInSemSegEval": 0},
+    {'name': 'vertical', 'color': (0, 0, 255), 'id': 2, 'semSegId': 2, "ignoredInSemSegEval": 0}
+]
+
+BDD_LANE_CONTINUITIES = [
+    {'name': 'background', 'color': (0, 0, 0), 'id': 0, 'semSegId': 0},
+    {'name': 'solid', 'color': (255, 0, 0), 'id': 1, 'semSegId': 1, "ignoredInSemSegEval": 0},
+    {'name': 'dashed', 'color': (0, 0, 255), 'id': 2, 'semSegId': 2, "ignoredInSemSegEval": 0}
+]
+
+BDD_LANE_CATEGORIES = [
+    {'name': 'background', 'color': (0, 0, 0), 'id': 0, 'semSegId': 0, "ignoredInSemSegEval": 0},
+    {'name': 'crosswalk', 'color': (255, 0, 0), 'id': 1, 'semSegId': 1, "ignoredInSemSegEval": 0},
+    {'name': 'double other', 'color': (0, 0, 255), 'id': 2, 'semSegId': 2, "ignoredInSemSegEval": 0},
+    {'name': 'double white', 'color': (150, 150, 150), 'id': 3, 'semSegId': 3, "ignoredInSemSegEval": 0},
+    {'name': 'double yellow', 'color': (255, 255, 0), 'id': 4, 'semSegId': 4, "ignoredInSemSegEval": 0},
+    {'name': 'road curb', 'color': (0, 255, 0), 'id': 5, 'semSegId': 5, "ignoredInSemSegEval": 0},
+    {'name': 'single other', 'color': (0, 0, 150), 'id': 6, 'semSegId': 6, "ignoredInSemSegEval": 0},
+    {'name': 'single white', 'color': (100, 100, 100), 'id': 7, 'semSegId': 7, "ignoredInSemSegEval": 0},
+    {'name': 'single yellow', 'color': (150, 150, 0), 'id': 8, 'semSegId': 8, "ignoredInSemSegEval": 0}
+]
+
 # fmt: off
 COCO_PERSON_KEYPOINT_NAMES = (
     "nose",
@@ -236,6 +310,57 @@ def _get_coco_panoptic_separated_meta():
     return ret
 
 
+def _get_bdd100k_instances_meta():
+    thing_ids = np.array([k["thing_id"] for k in BDD_CATEGORIES if k["hasInstance"] == 1])
+    thing_colors = np.array([k["color"] for k in BDD_CATEGORIES if k["hasInstance"] == 1])
+    # Mapping from the incontiguous COCO category id to an id in [0, 79]
+    thing_classes = np.array([k["name"] for k in BDD_CATEGORIES if k["hasInstance"] == 1])
+    idxs = np.argsort(thing_ids)[:8]
+    thing_ids, thing_colors, thing_classes = thing_ids[idxs].tolist(), thing_colors[idxs].tolist(), thing_classes[idxs].tolist()
+    thing_dataset_id_to_contiguous_id = {k: i for i, k in enumerate(thing_ids)}
+    ret = {
+        "thing_dataset_id_to_contiguous_id": thing_dataset_id_to_contiguous_id,
+        "thing_classes": thing_classes,
+        "thing_colors": thing_colors,
+    }
+    return ret
+
+
+def _get_bdd100k_sem_seg_meta(dataset_name='bdd100k_sem_seg'):
+    """
+    Returns metadata for "separated" version of the panoptic segmentation dataset.
+    """
+    if dataset_name == 'bdd100k_sem_seg':
+        categories = BDD_CATEGORIES
+    elif dataset_name == 'bdd100k_drivable':
+        categories = BDD_DRIVABLE_CATEGORIES
+    elif dataset_name == 'bdd100k_lane':
+        categories = BDD_LANE_DIRECTIONS
+    else:
+        raise Exception('dataset name "{}" not found!'.format(dataset_name))
+
+    stuff_ids = []
+    stuff_dataset_id_to_contiguous_id = {}
+    stuff_colors = []
+    stuff_classes = []
+    counter = 0
+    for i, k in enumerate(categories):
+        stuff_dataset_id_to_contiguous_id[k['id']] = k['semSegId']
+        if (i == 0) or k['semSegId'] < 19:
+            stuff_ids.append(k['semSegId'])
+            stuff_colors.append(k['color'])
+            stuff_classes.append(k['name'])
+    idxs = np.argsort(stuff_ids)
+    stuff_colors = [stuff_colors[i] for i in idxs]
+    stuff_classes = [stuff_classes[i] for i in idxs]
+    ret = {
+        "stuff_dataset_id_to_contiguous_id": stuff_dataset_id_to_contiguous_id,
+        "stuff_classes": stuff_classes,
+        "stuff_colors": stuff_colors,
+    }
+    return ret
+
+
 def _get_builtin_metadata(dataset_name):
     if dataset_name == "coco":
         return _get_coco_instances_meta()
@@ -248,6 +373,10 @@ def _get_builtin_metadata(dataset_name):
             "keypoint_flip_map": COCO_PERSON_KEYPOINT_FLIP_MAP,
             "keypoint_connection_rules": KEYPOINT_CONNECTION_RULES,
         }
+    elif dataset_name == "bdd100k_instances":
+        return _get_bdd100k_instances_meta()
+    elif dataset_name in ["bdd100k_sem_seg", "bdd100k_drivable", "bdd100k_lane"]:
+        return _get_bdd100k_sem_seg_meta(dataset_name)
     elif dataset_name == "cityscapes":
         # fmt: off
         CITYSCAPES_THING_CLASSES = [

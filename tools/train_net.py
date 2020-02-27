@@ -30,6 +30,7 @@ from detectron2.evaluation import (
     COCOEvaluator,
     COCOPanopticEvaluator,
     DatasetEvaluators,
+    LaneEvaluator,
     LVISEvaluator,
     PascalVOCDetectionEvaluator,
     SemSegEvaluator,
@@ -63,9 +64,31 @@ class Trainer(DefaultTrainer):
                 SemSegEvaluator(
                     dataset_name,
                     distributed=True,
-                    num_classes=cfg.MODEL.SEM_SEG_HEAD.NUM_CLASSES,
-                    ignore_label=cfg.MODEL.SEM_SEG_HEAD.IGNORE_VALUE,
+                    num_classes=cfg.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.NUM_CLASSES,
+                    ignore_label=cfg.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.IGNORE_VALUE,
                     output_dir=output_folder,
+                )
+            )
+        if evaluator_type == 'drivable':
+            evaluator_list.append(
+                SemSegEvaluator(
+                    dataset_name,
+                    distributed=True,
+                    num_classes=cfg.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.NUM_CLASSES,
+                    ignore_label=cfg.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.IGNORE_VALUE,
+                    bg_label=0,
+                    output_dir=output_folder,
+                    task_name='drivable',
+                )
+            )
+        if evaluator_type == 'lane':
+            evaluator_list.append(
+                LaneEvaluator(
+                    dataset_name,
+                    distributed=True,
+                    ignore_label=cfg.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.IGNORE_VALUE,
+                    output_dir=output_folder,
+                    num_classes=cfg.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.NUM_CLASSES,
                 )
             )
         if evaluator_type in ["coco", "coco_panoptic_seg"]:
@@ -157,6 +180,6 @@ if __name__ == "__main__":
         args.num_gpus,
         num_machines=args.num_machines,
         machine_rank=args.machine_rank,
-        dist_url=args.dist_url,
+        dist_url='auto', # args.dist_url,
         args=(args,),
     )
