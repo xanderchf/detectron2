@@ -3,6 +3,9 @@ from torch.nn import functional as F
 
 from detectron2.layers import paste_masks_in_image
 from detectron2.structures import Instances
+import numpy as np
+import torch
+from skimage.morphology import skeletonize
 
 
 def detector_postprocess(results, output_height, output_width, mask_threshold=0.5):
@@ -73,6 +76,38 @@ def sem_seg_postprocess(result, img_size, output_height, output_width):
     """
     result = result[:, : img_size[0], : img_size[1]].expand(1, -1, -1, -1)
     result = F.interpolate(
-        result, size=(output_height, output_width), mode="bilinear", align_corners=False
+        result, size=(output_height, output_width), mode='bilinear', align_corners=False
     )[0]
+    return result
+
+
+def one_hot(label_map, num_classes):
+	return (np.arange(num_classes) == label_map[...,None]).astype(int).transpose(2, 0, 1)
+
+
+def boundary_postprocess(result, img_size, output_height, output_width, thin=True):
+    """
+    Return thinned boundary predictions in the original resolution.
+
+    Args:
+        result (Tensor): semantic segmentation prediction logits. A tensor of shape (C, H, W),
+            where C is the number of classes, and H, W are the height and width of the prediction.
+        img_size (tuple): image size that segmentor is taking as input.
+        output_height, output_width: the desired output resolution.
+
+    Returns:
+        boundary prediction (Tensor): A tensor of the shape
+            (C, output_height, output_width) that contains per-pixel soft predictions.
+    """
+    result = result[:, : img_size[0], : img_size[1]].expand(1, -1, -1, -1)
+    result = F.interpolate(
+        result, size=(output_height, output_width), mode='bilinear', align_corners=False
+    )[0]
+    C = result.shape[0]
+    result = torch.argmax(result, dim=0)
+    result = one_hot(result.cpu().data.numpy(), C)[1:]
+    if thin:
+        # thin boundary
+        result = np.array([skeletonize(r) for r in result])
+
     return result

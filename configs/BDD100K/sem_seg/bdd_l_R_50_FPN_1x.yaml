@@ -1,0 +1,34 @@
+_BASE_: "../../Base-RCNN-FPN.yaml"
+MODEL:
+  META_ARCHITECTURE: "BddMultitaskModel"
+  WEIGHTS: "detectron2://ImageNetPretrained/MSRA/R-50.pkl"
+  RESNETS:
+    DEPTH: 50
+  SEM_SEG_HEADS:
+    LANE_DIRECTION_HEAD:
+      NAME: "GeneralSemSegFPNHead"
+      NUM_CLASSES: 3
+      FG_WEIGHT: 10.0
+      LOSS_ID: "lane_dir"
+    LANE_CONTINUITY_HEAD:
+      NAME: "GeneralSemSegFPNHead"
+      NUM_CLASSES: 3
+      FG_WEIGHT: 10.0
+      LOSS_ID: "lane_cont"
+    LANE_CATEGORY_HEAD:
+      NAME: "GeneralSemSegFPNHead"
+      NUM_CLASSES: 9
+      FG_WEIGHT: 10.0
+      LOSS_ID: "lane_cat"
+DATASETS:
+  TRAIN: ("bdd100k_train_lane",)
+  TEST: ("bdd100k_val_lane",)
+SOLVER:
+  IMS_PER_BATCH: 16
+  BASE_LR: 0.02
+  STEPS: (36000, 48000,)
+  MAX_ITER: 52500
+INPUT:
+  MIN_SIZE_TRAIN: (640, 672, 704, 736, 768, 800)
+TASKS: ("lane",)
+OUTPUT_DIR: "./checkpoints/bdd100k/l/resnet/r_50_fpn_1x_standard"

@@ -26,6 +26,8 @@ def setup_cfg(args):
     cfg.MODEL.RETINANET.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = args.confidence_threshold
     cfg.MODEL.PANOPTIC_FPN.COMBINE.INSTANCES_CONFIDENCE_THRESH = args.confidence_threshold
+    if args.weights:
+        cfg.MODEL.WEIGHTS = args.weights
     cfg.freeze()
     return cfg
 
@@ -59,6 +61,13 @@ def get_parser():
         help="Minimum score for instance predictions to be shown",
     )
     parser.add_argument(
+        "-w",
+        "--weights",
+        type=str,
+        default="",
+        help="Model weights",
+    )
+    parser.add_argument(
         "--opts",
         help="Modify config options using the command-line 'KEY VALUE' pairs",
         default=[],
@@ -87,15 +96,11 @@ if __name__ == "__main__":
             img = read_image(path, format="BGR")
             start_time = time.time()
             predictions, visualized_output = demo.run_on_image(img)
-            logger.info(
-                "{}: {} in {:.2f}s".format(
-                    path,
-                    "detected {} instances".format(len(predictions["instances"]))
-                    if "instances" in predictions
-                    else "finished",
-                    time.time() - start_time,
-                )
-            )
+            if 'instances' in predictions.keys():
+                logger.info(
+                    "{}: detected {} instances in {:.2f}s".format(
+                        path, len(predictions["instances"]), time.time() - start_time
+                    )
 
             if args.output:
                 if os.path.isdir(args.output):

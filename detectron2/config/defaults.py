@@ -374,21 +374,121 @@ _C.MODEL.ROI_KEYPOINT_HEAD.POOLER_TYPE = "ROIAlignV2"
 # ---------------------------------------------------------------------------- #
 # Semantic Segmentation Head
 # ---------------------------------------------------------------------------- #
-_C.MODEL.SEM_SEG_HEAD = CN()
-_C.MODEL.SEM_SEG_HEAD.NAME = "SemSegFPNHead"
-_C.MODEL.SEM_SEG_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+_C.MODEL.SEM_SEG_HEADS = CN()
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
 # Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
 # the correposnding pixel.
-_C.MODEL.SEM_SEG_HEAD.IGNORE_VALUE = 255
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.IGNORE_VALUE = 255
 # Number of classes in the semantic segmentation head
-_C.MODEL.SEM_SEG_HEAD.NUM_CLASSES = 54
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.NUM_CLASSES = 54
 # Number of channels in the 3x3 convs inside semantic-FPN heads.
-_C.MODEL.SEM_SEG_HEAD.CONVS_DIM = 128
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.CONVS_DIM = 128
 # Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
-_C.MODEL.SEM_SEG_HEAD.COMMON_STRIDE = 4
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.COMMON_STRIDE = 4
 # Normalization method for the convolution layers. Options: "" (no norm), "GN".
-_C.MODEL.SEM_SEG_HEAD.NORM = "GN"
-_C.MODEL.SEM_SEG_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.FG_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.SEM_SEG_HEAD.LOSS_ID = "sem_seg"
+
+# ---------------------------------------------------------------------------- #
+# Drivable Area Segmentation Head
+# ---------------------------------------------------------------------------- #
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+# Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
+# the correposnding pixel.
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.IGNORE_VALUE = 255
+# Number of classes in the semantic segmentation head
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.NUM_CLASSES = 3
+# Number of channels in the 3x3 convs inside semantic-FPN heads.
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.CONVS_DIM = 128
+# Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.COMMON_STRIDE = 4
+# Normalization method for the convolution layers. Options: "" (no norm), "GN".
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.FG_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.DRIVABLE_HEAD.LOSS_ID = "drivable"
+
+# ---------------------------------------------------------------------------- #
+# Lane Marking Segmentation Head
+# ---------------------------------------------------------------------------- #
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+# Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
+# the correposnding pixel.
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.IGNORE_VALUE = 255
+# Number of classes in the semantic segmentation head
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.NUM_CLASSES = 9
+# Number of channels in the 3x3 convs inside semantic-FPN heads.
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.CONVS_DIM = 128
+# Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.COMMON_STRIDE = 4
+# Normalization method for the convolution layers. Options: "" (no norm), "GN".
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.FG_WEIGHT = 10.0
+_C.MODEL.SEM_SEG_HEADS.LANE_MASK_HEAD.LOSS_ID = "lane"
+
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+# Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
+# the correposnding pixel.
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.IGNORE_VALUE = 255
+# Number of classes in the semantic segmentation head
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.NUM_CLASSES = 2
+# Number of channels in the 3x3 convs inside semantic-FPN heads.
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.CONVS_DIM = 128
+# Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.COMMON_STRIDE = 4
+# Normalization method for the convolution layers. Options: "" (no norm), "GN".
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.FG_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_DIRECTION_HEAD.LOSS_ID = "lane_dir"
+
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+# Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
+# the correposnding pixel.
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.IGNORE_VALUE = 255
+# Number of classes in the semantic segmentation head
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.NUM_CLASSES = 2
+# Number of channels in the 3x3 convs inside semantic-FPN heads.
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.CONVS_DIM = 128
+# Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.COMMON_STRIDE = 4
+# Normalization method for the convolution layers. Options: "" (no norm), "GN".
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.FG_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_CONTINUITY_HEAD.LOSS_ID = "lane_cont"
+
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD = CN()
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.NAME = "GeneralSemSegFPNHead"
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.IN_FEATURES = ["p2", "p3", "p4", "p5"]
+# Label in the semantic segmentation ground truth that is ignored, i.e., no loss is calculated for
+# the correposnding pixel.
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.IGNORE_VALUE = 255
+# Number of classes in the semantic segmentation head
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.NUM_CLASSES = 8
+# Number of channels in the 3x3 convs inside semantic-FPN heads.
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.CONVS_DIM = 128
+# Outputs from semantic-FPN heads are up-scaled to the COMMON_STRIDE stride.
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.COMMON_STRIDE = 4
+# Normalization method for the convolution layers. Options: "" (no norm), "GN".
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.NORM = "GN"
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.LOSS_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.FG_WEIGHT = 1.0
+_C.MODEL.SEM_SEG_HEADS.LANE_CATEGORY_HEAD.LOSS_ID = "lane_cat"
+
 
 _C.MODEL.PANOPTIC_FPN = CN()
 # Scaling of all losses from instance detection / segmentation head.
@@ -482,6 +582,7 @@ _C.MODEL.RESNETS.DEFORM_MODULATED = False
 # Number of groups in deformable conv.
 _C.MODEL.RESNETS.DEFORM_NUM_GROUPS = 1
 
+_C.TASKS = ()
 
 # ---------------------------------------------------------------------------- #
 # Solver
